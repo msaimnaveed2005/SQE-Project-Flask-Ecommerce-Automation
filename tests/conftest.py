@@ -1,8 +1,7 @@
 import pytest
 
 from website import create_app, db
-from website.models import Product
-
+from website.models import Customer, Product
 @pytest.fixture
 def app(tmp_path):
     database_path = tmp_path / "test.sqlite3"
@@ -47,3 +46,23 @@ def seeded_products(app):
         db.session.commit()
 
     return products
+
+
+@pytest.fixture
+def seeded_customer(app):
+    credentials = {
+        "email": "shopper@example.test",
+        "password": "sqe-test-password",
+    }
+
+    with app.app_context():
+        customer = Customer(
+            id=2,
+            email=credentials["email"],
+            username="SQE Shopper",
+        )
+        customer.password = credentials["password"]
+        db.session.add(customer)
+        db.session.commit()
+
+    return credentials
