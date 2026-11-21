@@ -1,7 +1,7 @@
 import pytest
 
 from website import create_app, db
-
+from website.models import Product
 
 @pytest.fixture
 def app(tmp_path):
@@ -19,3 +19,31 @@ def app(tmp_path):
         with app.app_context():
             db.session.remove()
             db.engine.dispose()
+
+
+@pytest.fixture
+def seeded_products(app):
+    products = {
+        "phone": {
+            "product_name": "SQE Test Phone",
+            "current_price": 1000.0,
+            "previous_price": 1200.0,
+            "in_stock": 10,
+            "product_picture": "/static/images/phone.jpg",
+            "flash_sale": True,
+        },
+        "watch": {
+            "product_name": "SQE Test Watch",
+            "current_price": 500.0,
+            "previous_price": 600.0,
+            "in_stock": 10,
+            "product_picture": "/static/images/oraimoWatch.jpg",
+            "flash_sale": False,
+        },
+    }
+
+    with app.app_context():
+        db.session.add_all(Product(**product) for product in products.values())
+        db.session.commit()
+
+    return products
