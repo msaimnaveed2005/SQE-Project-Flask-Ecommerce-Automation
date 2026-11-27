@@ -1,6 +1,7 @@
 from threading import Thread
 
 import pytest
+from selenium import webdriver
 from werkzeug.serving import make_server
 
 
@@ -16,3 +17,17 @@ def live_server(app):
         finally:
             server.shutdown()
             thread.join()
+
+
+@pytest.fixture
+def browser():
+    """Open a fresh Chrome session for one browser test."""
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--window-size=1280,800")
+
+    driver = webdriver.Chrome(options=options)
+    try:
+        yield driver
+    finally:
+        driver.quit()
